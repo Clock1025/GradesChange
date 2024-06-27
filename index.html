@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績轉換</title>
+</head>
+<body>
+    <h1>輸入成績</h1>
+    <input type="number" id="scoreInput" required>
+    <button onclick="addScore()">提交</button>
+    <button onclick="exportScores()">輸出成績</button>
+
+    <script>
+        let grades = [];
+
+        function convertScore(score) {
+            let plus = score % 10;
+            score = Math.floor(score / 10);
+            let grade = {1: "A", 2: "B", 3: "C"};
+            let pluss = "";
+            for (let i = 0; i < plus; i++) {
+                pluss += "+";
+            }
+            return grade[score] ? grade[score] + pluss : "Unknown" + pluss;
+        }
+
+        function addScore() {
+            let scoreInput = document.getElementById('scoreInput');
+            let score = parseInt(scoreInput.value);
+            if (score === 0) {
+                grades.push('');
+            } else {
+                let grade = convertScore(score);
+                grades.push(grade);
+                scoreInput.value = '';
+            }
+        }
+
+        function exportScores() {
+            let csvContent = "";
+            grades.forEach(function(grade) {
+                csvContent += grade + "\n";
+            });
+
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'grades.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.getElementById('scoreInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addScore();
+                event.preventDefault();  // 防止表單提交
+            }
+        });
+    </script>
+</body>
+</html>
