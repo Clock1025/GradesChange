@@ -7,51 +7,71 @@
 </head>
 <body>
     <h1>輸入成績</h1>
+    <!-- 分數輸入框 -->
     <input type="number" id="scoreInput" required>
+    <!-- 提交按鈕，調用 addScore() 函數 -->
     <button onclick="addScore()">提交</button>
+    <!-- 輸出成績按鈕，調用 exportScores() 函數 -->
     <button onclick="exportScores()">輸出成績</button>
+    <h2>操作說明：</h2>
+    <ul>
+        <li>輸入分數後，點擊「提交」按鈕或按 Enter 鍵即可將分數轉換為等級表示並添加到列表中。</li>
+        <li>點擊「輸出成績」按鈕將目前的成績列表導出為 CSV 文件，可供下載。</li>
+        <li>十位數表示等第；個位數表示「+」的個數，例如21將顯示為「B+」；例如30將顯示為「C」。</li>
+        <li>若輸入 0，將添加一行空白到成績列表中。</li>
+    </ul>
 
     <script>
+        // 成績列表數組
         let grades = [];
 
+        // 函數：將分數轉換為等級和加號表示
         function convertScore(score) {
-            let plus = score % 10;
-            score = Math.floor(score / 10);
-            let grade = {1: "A", 2: "B", 3: "C"};
+            let plus = score % 10; // 計算加號數量
+            score = Math.floor(score / 10); // 取整除法獲得等級
+            let grade = {1: "A", 2: "B", 3: "C"}; // 等級映射表
             let pluss = "";
+            // 構建加號字符串
             for (let i = 0; i < plus; i++) {
                 pluss += "+";
             }
+            // 返回等級和加號表示，若無對應等級則返回Unknown
             return grade[score] ? grade[score] + pluss : "Unknown" + pluss;
         }
 
+        // 函數：將分數添加到成績列表
         function addScore() {
-            let scoreInput = document.getElementById('scoreInput');
-            let score = parseInt(scoreInput.value);
+            let scoreInput = document.getElementById('scoreInput'); // 獲取分數輸入框
+            let score = parseInt(scoreInput.value); // 將輸入值轉換為整數
+
             if (score === 0) {
-                grades.push('');
+                grades.push(''); // 若分數為0，添加空字符串到成績列表
             } else {
-                let grade = convertScore(score);
-                grades.push(grade);
-                scoreInput.value = '';
+                let grade = convertScore(score); // 將分數轉換為等級表示
+                grades.push(grade); // 添加等級表示到成績列表
+                scoreInput.value = ''; // 清空分數輸入框
             }
         }
 
+        // 函數：導出成績列表為CSV文件
         function exportScores() {
             let csvContent = "";
             grades.forEach(function(grade) {
-                csvContent += grade + "\n";
+                csvContent += grade + "\n"; // 將每個成績添加到CSV內容中，每個成績占一行，並以換行符 \n 分隔
             });
 
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', 'grades.csv');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            let encodedUri = encodeURI(csvContent); // 將CSV內容進行URI編碼，準備生成下載連結
+
+            let link = document.createElement('a'); // 創建一個新的<a>元素來生成下載連結
+            link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodedUri); // 設置<a>元素的href屬性為編碼後的URI
+            link.setAttribute('download', 'grades.csv'); // 設置<a>元素的download屬性，指定下載文件的名稱為 'grades.csv'
+
+            document.body.appendChild(link); // 將創建的<a>元素添加到HTML文檔的body中，這樣它才能被瀏覽器渲染和操作
+            link.click(); // 使用JavaScript點擊這個<a>元素，觸發文件下載操作
+            document.body.removeChild(link); // 下載完成後，從HTML文檔的body中刪除這個<a>元素，清理內存和文檔結構
         }
 
+        // 監聽分數輸入框的鍵盤事件，當按下Enter鍵時調用 addScore() 函數
         document.getElementById('scoreInput').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 addScore();
